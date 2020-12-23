@@ -1,0 +1,86 @@
+package ${packageName}.service;
+
+import java.util.List;
+import ${packageName}.service.entity.${ClassName};
+import com.ptac.mds.api.vo.${ClassName}Vo;
+import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import com.github.pagehelper.PageInfo;
+import com.ptac.common.entity.PageEntity;
+#if($table.tree)
+import com.ruoyi.common.core.domain.Ztree;
+#end
+
+/**
+ * ${functionName}Service接口
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface I${ClassName}Service 
+{
+    /**
+     * 查询${functionName}
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return ${functionName}
+     */
+    public ${ClassName}Vo getById(${pkColumn.javaType} ${pkColumn.javaField});
+
+    /**
+     * 查询${functionName}列表
+     * 
+     * @param ${className}ParamVo ${functionName}
+     * @return ${functionName}集合
+     */
+    public List<${ClassName}Vo> listByEntity(${ClassName}ParamVo ${className}ParamVo);
+
+    /**
+     * 新增${functionName}
+     * 
+     * @param ${className}ParamVo ${functionName}
+     * @return 结果
+     */
+    public int save(${ClassName}ParamVo ${className}ParamVo);
+
+    /**
+     * 修改${functionName}
+     * 
+     * @param ${className}ParamVo ${functionName}
+     * @return 结果
+     */
+    public int updateById(${ClassName}ParamVo ${className}ParamVo);
+
+    /**
+     * 批量删除${functionName}
+     * 
+     * @param ${pkColumn.javaField}s 需要删除的数据ID
+     * @return 结果
+     */
+    public int removeByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s);
+
+    /**
+     * 删除${functionName}信息
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return 结果
+     */
+    public int removeById(${pkColumn.javaType} ${pkColumn.javaField});
+
+    /**
+     * 分页查询${functionName}列表
+     *
+     * @param ${className}ParamVo ${functionName}
+     * @return ${functionName}集合
+     */
+    public PageInfo<${ClassName}Vo> page(PageEntity<${ClassName}ParamVo> ${className}ParamVo);
+
+#if($table.tree)
+
+    /**
+     * 查询${functionName}树列表
+     * 
+     * @return 所有${functionName}信息
+     */
+    public List<Ztree> select${ClassName}Tree();
+#end
+}

@@ -124,29 +124,33 @@ public class VelocityUtils
     public static List<String> getTemplateList(String tplCategory)
     {
         List<String> templates = new ArrayList<String>();
-        templates.add("vm/java/domain.java.vm");
-        templates.add("vm/java/mapper.java.vm");
-        templates.add("vm/java/service.java.vm");
-        templates.add("vm/java/serviceImpl.java.vm");
-        templates.add("vm/java/controller.java.vm");
-        templates.add("vm/xml/mapper.xml.vm");
-        if (GenConstants.TPL_CRUD.equals(tplCategory))
-        {
-            templates.add("vm/html/list.html.vm");
-        }
-        else if (GenConstants.TPL_TREE.equals(tplCategory))
-        {
-            templates.add("vm/html/tree.html.vm");
-            templates.add("vm/html/list-tree.html.vm");
-        }
-        else if (GenConstants.TPL_SUB.equals(tplCategory))
-        {
-            templates.add("vm/html/list.html.vm");
-            templates.add("vm/java/sub-domain.java.vm");
-        }
-        templates.add("vm/html/add.html.vm");
-        templates.add("vm/html/edit.html.vm");
-        templates.add("vm/sql/sql.vm");
+        templates.add("hx_vm/java/convert.java.vm");
+        templates.add("hx_vm/java/domainVo.java.vm");
+        templates.add("hx_vm/java/domainParamVo.java.vm");
+        templates.add("hx_vm/java/domain.java.vm");
+        templates.add("hx_vm/java/mapper.java.vm");
+        templates.add("hx_vm/java/service.java.vm");
+        templates.add("hx_vm/java/serviceImpl.java.vm");
+        templates.add("hx_vm/java/controller.java.vm");
+        templates.add("hx_vm/xml/mapper.xml.vm");
+        templates.add("hx_vm/java/api.java.vm");
+//        if (GenConstants.TPL_CRUD.equals(tplCategory))
+//        {
+//            templates.add("vm/html/list.html.vm");
+//        }
+//        else if (GenConstants.TPL_TREE.equals(tplCategory))
+//        {
+//            templates.add("vm/html/tree.html.vm");
+//            templates.add("vm/html/list-tree.html.vm");
+//        }
+//        else if (GenConstants.TPL_SUB.equals(tplCategory))
+//        {
+//            templates.add("vm/html/list.html.vm");
+//            templates.add("vm/java/sub-domain.java.vm");
+//        }
+//        templates.add("vm/html/add.html.vm");
+//        templates.add("vm/html/edit.html.vm");
+//        templates.add("vm/sql/sql.vm");
         return templates;
     }
 
@@ -170,6 +174,22 @@ public class VelocityUtils
         String mybatisPath = MYBATIS_PATH + "/" + moduleName;
         String htmlPath = TEMPLATES_PATH + "/" + moduleName + "/" + businessName;
 
+        if (template.contains("api.java.vm"))
+        {
+            fileName = StringUtils.format("{}/inter/I{}Inter.java", javaPath, className);
+        }
+        if (template.contains("convert.java.vm"))
+        {
+            fileName = StringUtils.format("{}/convert/{}Convert.java", javaPath, className);
+        }
+        if (template.contains("domainParamVo.java.vm"))
+        {
+            fileName = StringUtils.format("{}/vo/{}ParamVo.java", javaPath, className);
+        }
+        if (template.contains("domainVo.java.vm"))
+        {
+            fileName = StringUtils.format("{}/vo/{}Vo.java", javaPath, className);
+        }
         if (template.contains("domain.java.vm"))
         {
             fileName = StringUtils.format("{}/domain/{}.java", javaPath, className);
@@ -180,7 +200,7 @@ public class VelocityUtils
         }
         else if (template.contains("mapper.java.vm"))
         {
-            fileName = StringUtils.format("{}/mapper/{}Mapper.java", javaPath, className);
+            fileName = StringUtils.format("{}/mapper/I{}Mapper.java", javaPath, className);
         }
         else if (template.contains("service.java.vm"))
         {
@@ -218,10 +238,10 @@ public class VelocityUtils
         {
             fileName = StringUtils.format("{}/edit.html", htmlPath);
         }
-        else if (template.contains("sql.vm"))
-        {
-            fileName = businessName + "Menu.sql";
-        }
+//        else if (template.contains("sql.vm"))
+//        {
+//            fileName = businessName + "Menu.sql";
+//        }
         return fileName;
     }
 

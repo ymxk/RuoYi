@@ -1,0 +1,173 @@
+package ${packageName}.controller;
+
+import java.util.List;
+import javax.annotation.Resource;
+import com.github.pagehelper.PageInfo;
+import com.ptac.common.entity.PageEntity;
+import com.ptac.common.result.PageResult;
+import com.ptac.common.result.Result;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.ptac.mds.api.inter.I${ClassName}Inter;
+import com.ptac.mds.service.entity.${ClassName};
+import com.ptac.mds.api.vo.${ClassName}Vo;
+import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import ${packageName}.service.service.I${ClassName}Service;
+#if($table.crud || $table.sub)
+#elseif($table.tree)
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.core.domain.Ztree;
+#end
+
+/**
+ * ${functionName}Controller
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+public class ${ClassName}Controller implements I${ClassName}Inter
+{
+    @Resource
+    private I${ClassName}Service ${className}Service;
+
+#if($table.crud || $table.sub)
+
+    /**
+     * 查询${functionName}
+     *
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return ${functionName}
+     */
+    @Override
+    public Result<${ClassName}Vo> getById(${pkColumn.javaType} ${pkColumn.javaField})
+    {
+        return new Result(${className}Service.getById(${pkColumn.javaField}));
+    }
+
+    /**
+     * 查询${functionName}列表
+     *
+     * @param ${className}ParamVo ${functionName}
+     * @return ${functionName}集合
+     */
+    @Override
+    public Result<List<${ClassName}Vo>> listByEntity(@RequestBody ${ClassName}ParamVo ${className}ParamVo)
+    {
+        return new Result(${className}Service.listByEntity(${className}ParamVo));
+    }
+#elseif($table.tree)
+    /**
+     * 查询${functionName}树列表
+     */
+    @RequiresPermissions("${permissionPrefix}:list")
+    @PostMapping("/list")
+    @ResponseBody
+    public List<${ClassName}Vo> list(${ClassName}ParamVo ${className}ParamVo)
+    {
+        List<${ClassName}Vo> list = ${className}Service.select${ClassName}List(${className}ParamVo);
+        return list;
+    }
+#end
+
+    /**
+     * 新增${functionName}
+     *
+     * @param ${className}ParamVo ${functionName}
+     * @return 结果
+     */
+    @Override
+    public Result save(${ClassName}ParamVo ${className}ParamVo)
+    {
+        return new Result(${className}Service.save(${className}ParamVo));
+    }
+
+    /**
+     * 修改${functionName}
+     *
+     * @param ${className}ParamVo ${functionName}
+     * @return 结果
+     */
+    @Override
+    public Result updateById(${ClassName}ParamVo ${className}ParamVo)
+    {
+        return new Result(${className}Service.updateById(${className}ParamVo));
+    }
+
+#if($table.crud || $table.sub)
+
+    /**
+     * 批量删除${functionName}
+     *
+     * @param ids 需要删除的数据ID
+     * @return 结果
+     */
+    @Override
+    public Result removeByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s)
+    {
+        return new Result(${className}Service.removeByIds(ids));
+    }
+
+    /**
+     * 删除${functionName}信息
+     *
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return 结果
+     */
+
+    @Override
+    public Result removeById(${pkColumn.javaType} ${pkColumn.javaField})
+    {
+        return new Result(${className}Service.removeById(${pkColumn.javaField}));
+    }
+
+    /**
+     * 分页查询${functionName}列表
+     *
+     * @param ${className}ParamVo ${functionName}
+     * @return ${functionName}集合
+     */
+    @Override
+    public Result<PageResult<${ClassName}Vo>>  page(@RequestBody PageEntity<${ClassName}ParamVo> ${className}ParamVo)
+    {
+        PageInfo<${ClassName}Vo> responseMode = ${className}Service.page(${className}ParamVo);
+        PageResult<${ClassName}Vo> pageResult = new PageResult<>();
+        pageResult.setList(responseMode.getList());
+        pageResult.setTotal(responseMode.getTotal());
+        return new Result(pageResult);
+    }
+#end
+#if($table.tree)
+
+    /**
+     * 选择${functionName}树
+     */
+#set($BusinessName=$businessName.substring(0,1).toUpperCase() + ${businessName.substring(1)})
+    @GetMapping(value = { "/select${BusinessName}Tree/{${pkColumn.javaField}}", "/select${BusinessName}Tree/" })
+    public String select${BusinessName}Tree(@PathVariable(value = "${pkColumn.javaField}", required = false) Long ${pkColumn.javaField}, ModelMap mmap)
+    {
+        if (StringUtils.isNotNull(${pkColumn.javaField}))
+        {
+            mmap.put("${className}", ${className}Service.select${ClassName}ById(${pkColumn.javaField}));
+        }
+        return prefix + "/tree";
+    }
+
+    /**
+     * 加载${functionName}树列表
+     */
+    @GetMapping("/treeData")
+    @ResponseBody
+    public List<Ztree> treeData()
+    {
+        List<Ztree> ztrees = ${className}Service.select${ClassName}Tree();
+        return ztrees;
+    }
+#end
+}

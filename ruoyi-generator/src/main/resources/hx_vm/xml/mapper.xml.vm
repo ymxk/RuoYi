@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.service.mapper.I${ClassName}Mapper">
+
+    <resultMap type="com.ptac.mds.service.entity.${ClassName}" id="${ClassName}Result">
+#foreach ($column in $columns)
+        <result property="${column.javaField}"    column="${column.columnName}"    />
+#end
+#if($table.tree)
+        <result property="parentName" column="parent_name" />
+#end
+    </resultMap>
+#if($table.sub)
+
+##    结果映射
+    <resultMap id="${ClassName}${subClassName}Result" type="com.ptac.mds.service.entity.${ClassName}" extends="${ClassName}Result">
+        <collection property="${subclassName}List" notNullColumn="${subTable.pkColumn.columnName}" javaType="java.util.List" resultMap="${subClassName}Result" />
+    </resultMap>
+
+    <resultMap type="${subClassName}" id="${subClassName}Result">
+#foreach ($column in $subTable.columns)
+        <result property="${column.javaField}"    column="${column.columnName}"    />
+#end
+    </resultMap>
+#end
+
+##    全量查询sql
+    <sql id="select${ClassName}Vo">
+        select#foreach($column in $columns) $column.columnName#if($velocityCount != $columns.size()),#end#end from ${tableName}
+    </sql>
+
+##    根据实体查询集合
+    <select id="listByEntity" parameterType="com.ptac.mds.service.entity.${ClassName}" resultMap="${ClassName}Result">
+        <include refid="select${ClassName}Vo"/>
+        <where>  
+#foreach($column in $columns)
+#set($queryType=$column.queryType)
+#set($javaField=$column.javaField)
+#set($javaType=$column.javaType)
+#set($columnName=$column.columnName)
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#if($column.query)
+#if($column.queryType == "EQ")
+            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName = #{$javaField}</if>
+#elseif($queryType == "NE")
+            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName != #{$javaField}</if>
+#elseif($queryType == "GT")
+            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &gt; #{$javaField}</if>
+#elseif($queryType == "GTE")
+            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &gt;= #{$javaField}</if>
+#elseif($queryType == "LT")
+            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &lt; #{$javaField}</if>
+#elseif($queryType == "LTE")
+            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName &lt;= #{$javaField}</if>
+#elseif($queryType == "LIKE")
+            <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end"> and $columnName like concat('%', #{$javaField}, '%')</if>
+#elseif($queryType == "BETWEEN")
+            <if test="params.begin$AttrName != null and params.begin$AttrName != '' and params.end$AttrName != null and params.end$AttrName != ''"> and $columnName between #{params.begin$AttrName} and #{params.end$AttrName}</if>
+#end
+#end
+#end
+        </where>
+#if($table.tree)
+        order by ${tree_parent_code}
+#end
+    </select>
+
+##    根据id查询
+    <select id="getById" parameterType="${pkColumn.javaType}" resultMap="#if($table.sub)${ClassName}${subClassName}Result#else${ClassName}Result#end">
+#if($table.crud)
+        <include refid="select${ClassName}Vo"/>
+        where ${pkColumn.columnName} = #{${pkColumn.javaField}}
+#elseif($table.tree)
+        select#foreach($column in $columns) t.$column.columnName,#end p.${tree_name} as parent_name
+        from ${tableName} t
+        left join ${tableName} p on p.${pkColumn.columnName} = t.${tree_parent_code}
+        where t.${pkColumn.columnName} = #{${pkColumn.javaField}}
+#elseif($table.sub)
+        select#foreach($column in $columns) a.$column.columnName#if($velocityCount != $columns.size()),#end#end,
+           #foreach($column in $subTable.columns) b.$column.columnName#if($velocityCount != $subTable.columns.size()),#end#end
+
+        from ${tableName} a
+        left join ${subTableName} b on b.${subTableFkName} = a.${pkColumn.columnName}
+        where a.${pkColumn.columnName} = #{${pkColumn.javaField}}
+#end
+    </select>
+
+##    添加数据
+    <insert id="save" parameterType="com.ptac.mds.service.entity.${ClassName}"#if($pkColumn.increment) useGeneratedKeys="true" keyProperty="$pkColumn.javaField"#end>
+        insert into ${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+#foreach($column in $columns)
+#if($column.columnName != $pkColumn.columnName || !$pkColumn.increment)
+            <if test="$column.javaField != null#if($column.javaType == 'String' && $column.required) and $column.javaField != ''#end">$column.columnName,</if>
+#end
+#end
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+#foreach($column in $columns)
+#if($column.columnName != $pkColumn.columnName || !$pkColumn.increment)
+            <if test="$column.javaField != null#if($column.javaType == 'String' && $column.required) and $column.javaField != ''#end">#{$column.javaField},</if>
+#end
+#end
+         </trim>
+    </insert>
+
+##    修改数据
+    <update id="updateById" parameterType="com.ptac.mds.service.entity.${ClassName}">
+        update ${tableName}
+        <trim prefix="SET" suffixOverrides=",">
+#foreach($column in $columns)
+#if($column.columnName != $pkColumn.columnName)
+            <if test="$column.javaField != null#if($column.javaType == 'String' && $column.required) and $column.javaField != ''#end">$column.columnName = #{$column.javaField},</if>
+#end
+#end
+        </trim>
+        where ${pkColumn.columnName} = #{${pkColumn.javaField}}
+    </update>
+
+##    根据id删除数据
+    <delete id="removeById" parameterType="${pkColumn.javaType}">
+        delete from ${tableName} where ${pkColumn.columnName} = #{${pkColumn.javaField}}
+    </delete>
+
+##    根据id集合删除数据
+    <delete id="removeByIds" parameterType="String">
+        delete from ${tableName} where ${pkColumn.columnName} in 
+        <foreach item="${pkColumn.javaField}" collection="array" open="(" separator="," close=")">
+            #{${pkColumn.javaField}}
+        </foreach>
+    </delete>
+#if($table.sub)
+    
+    <delete id="delete${subClassName}By${subTableFkClassName}s" parameterType="String">
+        delete from ${subTableName} where ${subTableFkName} in 
+        <foreach item="${subTableFkclassName}" collection="array" open="(" separator="," close=")">
+            #{${subTableFkclassName}}
+        </foreach>
+    </delete>
+
+    <delete id="delete${subClassName}By${subTableFkClassName}" parameterType="Long">
+        delete from ${subTableName} where ${subTableFkName} = #{${subTableFkclassName}}
+    </delete>
+
+    <insert id="batch${subClassName}">
+        insert into ${subTableName}(#foreach($column in $subTable.columns) $column.columnName#if($velocityCount != $subTable.columns.size()),#end#end) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            (#foreach($column in $subTable.columns) #{item.$column.javaField}#if($velocityCount != $subTable.columns.size()),#end#end)
+        </foreach>
+    </insert>
+#end
+
+</mapper>

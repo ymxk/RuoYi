@@ -1,0 +1,234 @@
+package ${packageName}.service.impl;
+
+import java.util.Date;
+import java.util.List;
+import com.baidu.fsg.uid.UidGenerator;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.ptac.common.entity.PageEntity;
+import lombok.extern.slf4j.Slf4j;
+#if($table.tree)
+import java.util.ArrayList;
+import com.ruoyi.common.core.domain.Ztree;
+#end
+#foreach ($column in $columns)
+#if($column.javaField == 'createTime' || $column.javaField == 'updateTime')
+#break
+#end
+#end
+import javax.annotation.Resource;
+import org.springframework.stereotype.Service;
+#if($table.sub)
+import java.util.ArrayList;
+import com.ruoyi.common.utils.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
+import ${packageName}.service.entity.${subClassName};
+import com.ptac.mds.api.vo.${ClassName}Vo;
+import com.ptac.mds.api.vo.${ClassName}ParamVo;
+#end
+import ${packageName}.service.mapper.I${ClassName}Mapper;
+import ${packageName}.service.entity.${ClassName};
+import com.ptac.mds.api.vo.${ClassName}Vo;
+import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import ${packageName}.service.service.I${ClassName}Service;
+import ${packageName}.service.convert.${ClassName}Convert;
+import org.springframework.beans.BeanUtils;
+
+/**
+ * ${functionName}Service业务层处理
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+@Slf4j
+public class ${ClassName}ServiceImpl implements I${ClassName}Service 
+{
+    @Resource
+    private I${ClassName}Mapper ${className}Mapper;
+
+    @Resource
+    private ${ClassName}Convert ${className}Convert;
+
+    @Resource
+    private UidGenerator uidGenerator;
+
+    /**
+     * 查询${functionName}
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return ${functionName}
+     */
+    @Override
+    public ${ClassName}Vo getById(${pkColumn.javaType} ${pkColumn.javaField})
+    {
+        ${ClassName} ${className} = ${className}Mapper.getById(${pkColumn.javaField});
+        return ${className}Convert.toConvertVO(${className});
+    }
+
+    /**
+     * 查询${functionName}列表
+     * 
+     * @param ${className}ParamVo ${functionName}
+     * @return ${functionName}
+     */
+    @Override
+    public List<${ClassName}Vo> listByEntity(${ClassName}ParamVo ${className}ParamVo)
+    {
+        List<${ClassName}> ${className}s = ${className}Mapper.listByEntity(${className}Convert.toParamConvertEntity(${className}ParamVo));
+        return ${className}Convert.toConvertVOList(${className}s);
+    }
+
+    /**
+     * 新增${functionName}
+     * 
+     * @param ${className}ParamVo ${functionName}
+     * @return 结果
+     */
+#if($table.sub)
+    @Transactional
+#end
+    @Override
+    public int save(${ClassName}ParamVo ${className}ParamVo)
+    {
+#foreach ($column in $columns)
+#if($column.javaField == 'createTime')
+        ${className}ParamVo.setCreateTime(new Date());
+        ${className}ParamVo.setId(uidGenerator.getUID());
+#end
+#end
+#if($table.sub)
+        int rows = ${className}Mapper.insert${ClassName}(${className});
+        insert${subClassName}(${className});
+        return rows;
+#else
+        return ${className}Mapper.save(${className}Convert.toParamConvertEntity(${className}ParamVo));
+#end
+    }
+
+    /**
+     * 修改${functionName}
+     * 
+     * @param ${className}ParamVo ${functionName}
+     * @return 结果
+     */
+#if($table.sub)
+    @Transactional
+#end
+    @Override
+    public int updateById(${ClassName}ParamVo ${className}ParamVo)
+    {
+#foreach ($column in $columns)
+#if($column.javaField == 'lastUpdateTime')
+        ${className}ParamVo.setLastUpdateTime(new Date());
+#end
+#end
+#if($table.sub)
+        ${className}Mapper.delete${subClassName}By${subTableFkClassName}(${className}.get${pkColumn.capJavaField}());
+        insert${subClassName}(${className});
+#end
+        return ${className}Mapper.updateById(${className}Convert.toParamConvertEntity(${className}ParamVo));
+    }
+
+    /**
+     * 删除${functionName}对象
+     * 
+     * @param ${pkColumn.javaField}s 需要删除的数据ID
+     * @return 结果
+     */
+#if($table.sub)
+    @Transactional
+#end
+    @Override
+    public int removeByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s)
+    {
+#if($table.sub)
+        ${className}Mapper.delete${subClassName}By${subTableFkClassName}s(Convert.toStrArray(ids));
+#end
+        return ${className}Mapper.removeByIds(ids);
+    }
+
+    /**
+     * 删除${functionName}信息
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return 结果
+     */
+    @Override
+    public int removeById(${pkColumn.javaType} ${pkColumn.javaField})
+    {
+#if($table.sub)
+        ${className}Mapper.delete${subClassName}By${subTableFkClassName}(${pkColumn.javaField});
+#end
+        return ${className}Mapper.removeById(${pkColumn.javaField});
+    }
+    /**
+     * 分页查询${functionName}列表
+     *
+     * @param param ${functionName}
+     * @return ${functionName}
+     */
+    @Override
+    public PageInfo<${ClassName}Vo> page(PageEntity<${ClassName}ParamVo> param)
+    {
+        // 1.封装分页参数【开始页码（从1开始），每页条数】
+        PageHelper.startPage(param.getPageNum(), param.getPageSize());
+        // 2.开始查询
+        List<${ClassName}> list = ${className}Mapper.listByEntity(${className}Convert.toParamConvertEntity(param.getMode()));
+        return new PageInfo<${ClassName}Vo>(${className}Convert.toConvertVOList(list));
+    }
+
+#if($table.tree)
+
+    /**
+     * 查询${functionName}树列表
+     * 
+     * @return 所有${functionName}信息
+     */
+    @Override
+    public List<Ztree> select${ClassName}Tree()
+    {
+        List<${ClassName}> ${className}List = ${className}Mapper.select${ClassName}List(new ${ClassName}());
+        List<Ztree> ztrees = new ArrayList<Ztree>();
+        for (${ClassName} ${className} : ${className}List)
+        {
+            Ztree ztree = new Ztree();
+#set($TreeCode=$treeCode.substring(0,1).toUpperCase() + ${treeCode.substring(1)})
+#set($TreeParentCode=$treeParentCode.substring(0,1).toUpperCase() + ${treeParentCode.substring(1)})
+#set($TreeName=$treeName.substring(0,1).toUpperCase() + ${treeName.substring(1)})
+            ztree.setId(${className}.get${TreeCode}());
+            ztree.setpId(${className}.get${TreeParentCode}());
+            ztree.setName(${className}.get${TreeName}());
+            ztree.setTitle(${className}.get${TreeName}());
+            ztrees.add(ztree);
+        }
+        return ztrees;
+    }
+#end
+#if($table.sub)
+
+    /**
+     * 新增${subTable.functionName}信息
+     * 
+     * @param ${className} ${functionName}对象
+     */
+    public void insert${subClassName}(${ClassName} ${className})
+    {
+        List<${subClassName}> ${subclassName}List = ${className}.get${subClassName}List();
+        Long ${pkColumn.javaField} = ${className}.get${pkColumn.capJavaField}();
+        if (StringUtils.isNotNull(${subclassName}List))
+        {
+            List<${subClassName}> list = new ArrayList<${subClassName}>();
+            for (${subClassName} ${subclassName} : ${subclassName}List)
+            {
+                ${subclassName}.set${pkColumn.capJavaField}(${pkColumn.javaField});
+                list.add(${subclassName});
+            }
+            if (list.size() > 0)
+            {
+                ${className}Mapper.batch${subClassName}(list);
+            }
+        }
+    }
+#end
+}

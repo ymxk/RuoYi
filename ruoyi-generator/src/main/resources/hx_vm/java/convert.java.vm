@@ -1,0 +1,50 @@
+package ${packageName}.service.convert;
+
+import ${packageName}.service.entity.${ClassName};
+import com.ptac.mds.api.vo.${ClassName}Vo;
+import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import org.mapstruct.Mapper;
+import java.util.List;
+
+
+/**
+ * ${functionName}(${ClassName})表实体VO转换接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Mapper(componentModel = "spring")
+public interface ${ClassName}Convert {
+
+    /**
+     * 实体类转VO
+     *
+     * @param ${className} 实体类数据
+     * @return VO数据
+     */
+     ${ClassName}Vo toConvertVO(${ClassName} ${className});
+
+    /**
+     * VO转实体类
+     *
+     * @param ${className}Vo VO数据
+     * @return 实体类数据
+     */
+     ${ClassName} toConvertEntity(${ClassName}Vo ${className}Vo);
+
+    /**
+     * VO转实体类
+     *
+     * @param ${className}ParamVo VO数据
+     * @return 实体类数据
+     */
+     ${ClassName} toParamConvertEntity(${ClassName}ParamVo ${className}ParamVo);
+
+    /**
+     * 实体类列表转VO列表
+     *
+     * @param ${className}s 实体类列表数据
+     * @return VO数据列表
+     */
+    List<${ClassName}Vo> toConvertVOList(List<${ClassName}> ${className}s);
+}
