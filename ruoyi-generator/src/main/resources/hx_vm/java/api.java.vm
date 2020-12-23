@@ -7,8 +7,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-import com.ptac.mds.api.vo.${ClassName}Vo;
-import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import ${packageName}.api.vo.${ClassName}Vo;
+import ${packageName}.api.vo.${ClassName}ParamVo;
 #if($table.crud || $table.sub)
 #elseif($table.tree)
 import com.ruoyi.common.utils.StringUtils;

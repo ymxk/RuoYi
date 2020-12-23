@@ -2,8 +2,8 @@ package ${packageName}.service;
 
 import java.util.List;
 import ${packageName}.service.entity.${ClassName};
-import com.ptac.mds.api.vo.${ClassName}Vo;
-import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import ${packageName}.api.vo.${ClassName}Vo;
+import ${packageName}.api.vo.${ClassName}ParamVo;
 import com.github.pagehelper.PageInfo;
 import com.ptac.common.entity.PageEntity;
 #if($table.tree)

@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import ${packageName}.service.entity.${subClassName};
-import com.ptac.mds.api.vo.${ClassName}Vo;
-import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import ${packageName}.api.vo.${ClassName}Vo;
+import ${packageName}.api.vo.${ClassName}ParamVo;
 #end
 import ${packageName}.service.mapper.I${ClassName}Mapper;
 import ${packageName}.service.entity.${ClassName};
-import com.ptac.mds.api.vo.${ClassName}Vo;
-import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import ${packageName}.api.vo.${ClassName}Vo;
+import ${packageName}.api.vo.${ClassName}ParamVo;
 import ${packageName}.service.service.I${ClassName}Service;
 import ${packageName}.service.convert.${ClassName}Convert;
 import org.springframework.beans.BeanUtils;

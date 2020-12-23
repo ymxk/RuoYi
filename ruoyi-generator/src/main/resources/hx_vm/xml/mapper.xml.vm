@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="${packageName}.service.mapper.I${ClassName}Mapper">
 
-    <resultMap type="com.ptac.mds.service.entity.${ClassName}" id="${ClassName}Result">
+    <resultMap type="${packageName}.service.entity.${ClassName}" id="${ClassName}Result">
 #foreach ($column in $columns)
         <result property="${column.javaField}"    column="${column.columnName}"    />
 #end
@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 #if($table.sub)
 
 ##    结果映射
-    <resultMap id="${ClassName}${subClassName}Result" type="com.ptac.mds.service.entity.${ClassName}" extends="${ClassName}Result">
+    <resultMap id="${ClassName}${subClassName}Result" type="${packageName}.service.entity.${ClassName}" extends="${ClassName}Result">
         <collection property="${subclassName}List" notNullColumn="${subTable.pkColumn.columnName}" javaType="java.util.List" resultMap="${subClassName}Result" />
     </resultMap>
 
@@ -32,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
 ##    根据实体查询集合
-    <select id="listByEntity" parameterType="com.ptac.mds.service.entity.${ClassName}" resultMap="${ClassName}Result">
+    <select id="listByEntity" parameterType="${packageName}.service.entity.${ClassName}" resultMap="${ClassName}Result">
         <include refid="select${ClassName}Vo"/>
         <where>  
 #foreach($column in $columns)
@@ -88,7 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
 ##    添加数据
-    <insert id="save" parameterType="com.ptac.mds.service.entity.${ClassName}"#if($pkColumn.increment) useGeneratedKeys="true" keyProperty="$pkColumn.javaField"#end>
+    <insert id="save" parameterType="${packageName}.service.entity.${ClassName}"#if($pkColumn.increment) useGeneratedKeys="true" keyProperty="$pkColumn.javaField"#end>
         insert into ${tableName}
         <trim prefix="(" suffix=")" suffixOverrides=",">
 #foreach($column in $columns)
@@ -107,7 +107,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
 ##    修改数据
-    <update id="updateById" parameterType="com.ptac.mds.service.entity.${ClassName}">
+    <update id="updateById" parameterType="${packageName}.service.entity.${ClassName}">
         update ${tableName}
         <trim prefix="SET" suffixOverrides=",">
 #foreach($column in $columns)

@@ -1,8 +1,8 @@
 package ${packageName}.service.convert;
 
 import ${packageName}.service.entity.${ClassName};
-import com.ptac.mds.api.vo.${ClassName}Vo;
-import com.ptac.mds.api.vo.${ClassName}ParamVo;
+import ${packageName}.api.vo.${ClassName}Vo;
+import ${packageName}.api.vo.${ClassName}ParamVo;
 import org.mapstruct.Mapper;
 import java.util.List;
 
